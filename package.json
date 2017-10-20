@@ -1,0 +1,23 @@
+{
+  "name": "office-365-mgmt-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafa-el-nunes/office365-mgmt-bot.git"
+  },
+  "author": "Rafael Nunes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rafa-el-nunes/office365-mgmt-bot/issues"
+  },
+  "homepage": "https://github.com/rafa-el-nunes/office365-mgmt-bot#readme",
+  "dependencies": {
+    "botbuilder": "^3.11.0",
+    "request": "^2.83.0"
+  }
+}
