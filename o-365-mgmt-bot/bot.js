@@ -63,12 +63,9 @@ bot.dialog('createUser', [
         console.log(stringResult);
         next();
     },
-    (session, results) => {
-        var stringResult = JSON.stringify(session.privateConversationData);
-        console.log(stringResult);
+    (session) => {
         graphAPI.getGraphAPIToken().then((result) => {
             var jsonBody = JSON.parse(result.body);
-            console.log(jsonBody.access_token);
             return graphAPI.createUser(session.privateConversationData['enableUser'], session.privateConversationData['displayName'], session.privateConversationData['emailNickname'], { "password": session.privateConversationData['password'], "forceChangePasswordNextSignIn": false }, `${session.privateConversationData['userPrincipalName']}@rafaelnunes.onmicrosoft.com`, jsonBody.access_token);
         }).catch((errorMessage) => {
             console.log(errorMessage);
