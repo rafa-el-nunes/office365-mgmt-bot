@@ -1,22 +1,20 @@
 "use strict";
+
+//Requiring NPM packages
 const path = require('path');
-const graphAPI = require(path.join(__dirname, '..', 'GraphAPI/graph.js'));
 const builder = require("botbuilder");
+
+//Requiring local files
+const graphAPI = require(path.join(__dirname, '..', 'GraphAPI/graph.js'));
 const luis = require(path.join(__dirname, '..', '/LUIS/luis.js'));
 const createUserDialogs = require(path.join(__dirname, '..', '/Dialogs/createUser.js'));
+const passwordGenerator = require(path.join(__dirname, '..', '/Utils/passwords.js'));
+
+//Building BOT object
 const connector = new builder.ChatConnector();
-
-// const bot = new builder.UniversalBot(
-//     connector,
-//     (session) => {
-//         session.beginDialog('adminConsent');
-//     }
-// );
-
 const bot = new builder.UniversalBot(connector);
 
 bot.recognizer(new builder.LuisRecognizer(luis.luisAppUrl));
-console.log(luis.luisAppUrl);
 function createSigninCard(session) {
     return new builder.SigninCard(session)
         .text('This bot is only for admins')
@@ -51,22 +49,31 @@ bot.dialog('createUser', [
     },
     (session, results) => {
         session.privateConversationData['emailNickname'] = results.response;
-        builder.Prompts.text(session, `Type a temporary password. The user will be prompted to change it during the first access.`);
-    },
-    (session, results) => {
-        session.privateConversationData['password'] = results.response;
         builder.Prompts.confirm(session, `Should I active this user right after creation?`, { listStyle: builder.ListStyle.button });
     },
     (session, results, next) => {
         session.privateConversationData['enableUser'] = results.response;
-        var stringResult = JSON.stringify(session.privateConversationData);
-        console.log(stringResult);
+        var password = null;
+        passwordGenerator.generatePassword().then((generatedPassword) => {
+            session.privateConversationData['password'] = generatedPassword.password;
+        }).catch((error) => {
+            session.send(error);
+        });
         next();
     },
     (session) => {
         graphAPI.getGraphAPIToken().then((result) => {
             var jsonBody = JSON.parse(result.body);
-            return graphAPI.createUser(session.privateConversationData['enableUser'], session.privateConversationData['displayName'], session.privateConversationData['emailNickname'], { "password": session.privateConversationData['password'], "forceChangePasswordNextSignIn": false }, `${session.privateConversationData['userPrincipalName']}@rafaelnunes.onmicrosoft.com`, jsonBody.access_token);
+            graphAPI.createUser(session.privateConversationData['enableUser'],
+                session.privateConversationData['displayName'],
+                session.privateConversationData['emailNickname'],
+                {
+                    "password": session.privateConversationData['password'],
+                    "forceChangePasswordNextSignIn": true
+                },
+                `${session.privateConversationData['userPrincipalName']}@rafaelnunes.onmicrosoft.com`,
+                jsonBody.access_token);
+                session.endDialog();
         }).catch((errorMessage) => {
             console.log(errorMessage);
         });
@@ -79,7 +86,6 @@ bot.dialog('createUser', [
 
 bot.use({
     receive: (event, next) => {
-        console.log(event.text);
         next();
     }
 });

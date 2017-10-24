@@ -2,7 +2,6 @@ const request = require('request');
 require('dotenv').config();
 
 var getGraphAPIToken = () => {
-    console.log('startgetGraphAPIToken');
     var options = {
         method: 'POST',
         url: 'https://login.microsoftonline.com/c021a310-bac1-4dd3-a72d-97b350560afe/oauth2/v2.0/token',
@@ -67,12 +66,9 @@ var createUser = (accountEnaled, displayName, mailNickname, passwordProfile, use
     return new Promise((resolve, reject) => {
         request(options,
             (error, response, body) => {
-                console.log('oi');
                 if (error) {
                     reject(error);
                 } else {
-                    console.log(response);
-                    console.log(accessToken);
                     resolve(response);
                 }
             });
