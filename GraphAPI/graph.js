@@ -2,6 +2,7 @@ const request = require('request');
 require('dotenv').config();
 
 var getGraphAPIToken = () => {
+    console.log('startgetGraphAPIToken');
     var options = {
         method: 'POST',
         url: 'https://login.microsoftonline.com/c021a310-bac1-4dd3-a72d-97b350560afe/oauth2/v2.0/token',
@@ -11,10 +12,10 @@ var getGraphAPIToken = () => {
         },
         form:
         {
-            client_id: '001a308e-36f6-433c-ab52-646f2c0b3dd6',
-            scope: 'https://graph.microsoft.com/.default',
-            client_secret: 'OiVDRYu0LHw9WaGOQkQe0QC',
-            grant_type: 'client_credentials'
+            client_id: `${process.env.MICROSOFT_APP_ID}`,
+            scope: `${process.env.SCOPE}`,
+            client_secret: `${process.env.MICROSOFT_APP_PASSWORD}`,
+            grant_type: `${process.env.GRANT_TYPE}`
         }
     };
 
@@ -66,7 +67,7 @@ var createUser = (accountEnaled, displayName, mailNickname, passwordProfile, use
     return new Promise((resolve, reject) => {
         request(options,
             (error, response, body) => {
-                //var bodyJSON = JSON.parse(body);
+                console.log('oi');
                 if (error) {
                     reject(error);
                 } else {

@@ -25,10 +25,4 @@ app.get('/token', (request, response) => {
     }
 });
 
-// const server = restify.createServer();
-// server.post('/api/messages', bot.connector('*').listen());
-// server.listen(process.env.PORT, () => {
-//     console.log(`${server.name} listening to ${server.url}`);
-// });
-
 app.listen(process.env.PORT);
