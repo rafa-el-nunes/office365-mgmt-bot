@@ -9,6 +9,7 @@ const graphAPI = require(path.join(__dirname, '..', 'GraphAPI/graph.js'));
 const luis = require(path.join(__dirname, '..', '/LUIS/luis.js'));
 const createUserDialogs = require(path.join(__dirname, '..', '/Dialogs/createUser.js'));
 const passwordGenerator = require(path.join(__dirname, '..', '/Utils/passwords.js'));
+const emailer = require(path.join(__dirname, '..', '/Utils/Emailer.js'));
 
 //Building BOT object
 const connector = new builder.ChatConnector();
@@ -20,6 +21,14 @@ function createSigninCard(session) {
         .text('This bot is only for admins')
         .button('Consent', `https://login.microsoftonline.com/rafaelnunes.onmicrosoft.com/adminconsent?client_id=${process.env.MICROSOFT_APP_ID}&state=12345&redirect_uri=${process.env.REDIRECT_URI}`);
 }
+
+bot.dialog('testMessage', [
+    (session, args, next) => {
+        
+    }
+]).triggerAction({
+    matches: /^testMessage/i
+});
 
 bot.dialog('adminConsent', [
     (session, args, next) => {
@@ -58,6 +67,11 @@ bot.dialog('createUser', [
         var password = null;
         passwordGenerator.generatePassword().then((generatedPassword) => {
             session.privateConversationData['password'] = generatedPassword.password;
+            emailer.sendEmail('Office 365 BOT', generatedPassword.password, session.privateConversationData['userPrincipalName']).then((response) => {
+                console.log('email sent');
+            }).catch((error) => {
+
+            });
         }).catch((error) => {
             session.send(error);
         });

@@ -15,10 +15,10 @@ app.post('/api/messages', bot.connector().listen());
 
 app.get('/token', (request, response) => {
     var rawUrl = `${process.env.BASE_URI}${request.originalUrl}`;
-    var parsedUrl = url.parse(rawUrl);    
+    var parsedUrl = url.parse(rawUrl);
     var parsedQueryString = queryString.parse(parsedUrl.query);
     var adminConsent = parsedQueryString.admin_consent;
-    if(adminConsent) {
+    if (adminConsent) {
         response.send('You can go back to the chat now');
     } else {
         response.send('You are not authorized to use this BOT');
