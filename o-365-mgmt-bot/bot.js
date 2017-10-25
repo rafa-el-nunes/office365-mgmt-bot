@@ -12,9 +12,7 @@ const passwordGenerator = require(path.join(__dirname, '..', '/Utils/passwords.j
 
 //Building BOT object
 const connector = new builder.ChatConnector();
-const bot = new builder.UniversalBot(connector, (session) => {
-    session.beginDialog('adminConsent');
-});
+const bot = new builder.UniversalBot(connector);
 bot.recognizer(new builder.LuisRecognizer(luis.luisAppUrl));
 
 function createSigninCard(session) {
@@ -28,15 +26,16 @@ bot.dialog('adminConsent', [
         var card = createSigninCard(session);
         var msg = new builder.Message(session).addAttachment(card);
         session.send(msg);
+        session.endDialog();
     }
 ]).triggerAction({
-    matches: 'adminConsent'
+    matches: /^admin-consent/i
 });
 
-// bot.dialog('/', (session, args, next) => {
-//     session.send('Hi!');
-//     session.endConversation();
-// });
+bot.dialog('/', (session, args, next) => {
+    session.send('Hi!');
+    session.endConversation();
+});
 
 bot.dialog('createUser', [
     (session, args) => {
@@ -67,7 +66,6 @@ bot.dialog('createUser', [
     (session) => {
         graphAPI.getGraphAPIToken().then((result) => {
             var jsonBody = JSON.parse(result.body);
-            console.log(result.body);
             graphAPI.createUser(session.privateConversationData['enableUser'],
                 session.privateConversationData['displayName'],
                 session.privateConversationData['emailNickname'],
@@ -80,7 +78,6 @@ bot.dialog('createUser', [
                     session.endConversation();
                 });
         }).catch((errorMessage) => {
-            console.log(errorMessage);
             session.endConversation();
         });
     }

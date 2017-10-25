@@ -67,10 +67,8 @@ var createUser = (accountEnaled, displayName, mailNickname, passwordProfile, use
         request(options,
             (error, response, body) => {
                 if (error) {
-                    console.log(error);
                     reject(error);
                 } else {
-                    console.log(response);
                     resolve(response);
                 }
             });
