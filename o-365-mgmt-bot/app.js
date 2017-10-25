@@ -11,7 +11,7 @@ const app = express();
 
 const server = http.createServer(app);
 
-app.post('/api/messages', bot.connector('*').listen());
+app.post('/api/messages', bot.connector().listen());
 
 app.get('/token', (request, response) => {
     var rawUrl = `${process.env.BASE_URI}${request.originalUrl}`;
