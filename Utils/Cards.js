@@ -35,10 +35,9 @@ const userSummaryAdaptiveCard = {
     }
 };
 
-function buildUserSummaryAdaptiveCard(userProperties) {
+function buildUserSummaryAdaptiveCard(userProperties, actions) {
     var payload = JSON.parse(JSON.stringify(userSummaryAdaptiveCard));
-    userProperties.forEach(function (element) {
-        console.log(typeof (element.value));
+    userProperties.forEach((element) => {
         payload.content.body[0].items[2].facts.push(
             {
                 type: 'Fact',
@@ -47,6 +46,20 @@ function buildUserSummaryAdaptiveCard(userProperties) {
             }
         );
     }, this);
+
+    if (actions.length > 0) {
+        payload.content.actions = actions;
+        console.log(actions);
+
+        payload.content.body[0].items.push(
+            {
+                type: 'TextBlock',
+                text: `I’ve created the user with only the minimum required properties. To complete its profile, please chose from options below:`,
+                wrap: true
+            }
+        );
+    }
+
     return payload;
 }
 

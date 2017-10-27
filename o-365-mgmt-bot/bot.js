@@ -55,11 +55,11 @@ bot.dialog('createUser', [
                     var userProperties = [];
                     userProperties = [
                         {
-                            title: 'Display Name',
+                            title: 'Display Name:',
                             value: session.privateConversationData['displayName']
                         },
                         {
-                            title: 'User Principal Name',
+                            title: 'User Principal Name:',
                             value: session.privateConversationData['userPrincipalName']
                         },
                         {
@@ -68,7 +68,24 @@ bot.dialog('createUser', [
                         }
                     ];
 
-                    var card = cards.buildUserSummaryAdaptiveCard(userProperties);
+                    var actions = [];
+
+                    if(session.privateConversationData['finalDialog']) {
+                        actions = [
+                            {
+                                type: 'Action.OpenUrl',
+                                url: `${process.env.AZURE_PORTALURL_USERID}${session.privateConversationData['userID']}`,
+                                title: 'Azure'
+                            },
+                            {
+                                type: 'Action.OpenUrl',
+                                url: `${process.env.OFFICE365_PORTALURL_USERS}`,
+                                title: 'Office 365'
+                            }
+                        ];
+                    }
+
+                    var card = cards.buildUserSummaryAdaptiveCard(userProperties, actions);
                     var msg = new builder.Message(session).addAttachment(card);
                     session.send(msg);
                     next();
@@ -88,6 +105,7 @@ bot.dialog('createUser', [
                                 },
                                 `${session.privateConversationData['userPrincipalName']}@${process.env.TENANT_DOMAIN}`,
                                 jsonBody.access_token).then((response) => {
+                                    session.privateConversationData['userID'] = response.body.id;
                                     next();
                                 });
                         }).catch((error) => {
@@ -98,8 +116,8 @@ bot.dialog('createUser', [
                         session.endConversation();
                     });
                 } else if (dialog.promptType === 'sendemail') {
-                    console.log(session.privateConversationData);
                     emailer.sendEmail('A user account has been created or modified', session.privateConversationData['password'], `${session.privateConversationData['userPrincipalName']}@rafaelnunes.onmicrosoft.com`).then((response) => {
+                        session.privateConversationData['finalDialog'] = true;
                         next();
                     }).catch((error) => {
                         session.endConversation();
@@ -119,7 +137,6 @@ bot.dialog('createUser', [
         }
 
         session.privateConversationData['dialogOrder'] = session.privateConversationData['dialogOrder'] + 1;
-        console.log(session.privateConversationData['dialogOrder']);
         session.replaceDialog('createUser');
     }
 ])
@@ -147,7 +164,6 @@ bot.dialog('adminConsent', [
 
 bot.dialog('adaptiveCard', (session, args, next) => {
     var card = cards.userSummaryAdaptiveCard;
-    console.log(JSON.stringify(card));
     var msg = new builder.Message(session).addAttachment(card);
     session.send(msg);
 }).triggerAction({

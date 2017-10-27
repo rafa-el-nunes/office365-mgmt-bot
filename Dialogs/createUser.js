@@ -58,10 +58,16 @@ const createUserDialog = [
         message: `Done. The new user is now created. You should have got an e-mail with the password.`,
         userPropertyName: '',
         promptType: 'botmessage'
+    },
+    {
+        order: 11,
+        message: ``,
+        userPropertyName: '',
+        promptType: 'adaptivecard'
     }
 ];
 
-var getUserDialog = () => {
+var getUserDialog = function () {
     var userDialog = JSON.parse(JSON.stringify(createUserDialog));
     return userDialog;
 };
