@@ -39,10 +39,8 @@ var sendEmail = (subject, password, userName) => {
                     SaveToSentItems: false,
                 };
 
-                console.log(options);
-
                 request(options, (error, response, body) => {
-                    if (body) {
+                    if (!body.error) {
                         resolve(body);
                     } else {
                         reject(body);
