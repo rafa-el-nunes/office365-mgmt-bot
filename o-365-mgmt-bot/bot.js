@@ -20,7 +20,7 @@ bot.recognizer(new builder.LuisRecognizer(luis.luisAppUrl));
 function createSigninCard(session) {
     return new builder.SigninCard(session)
         .text('This bot is only for admins')
-        .button('Consent', `https://login.microsoftonline.com/rafaelnunes.onmicrosoft.com/adminconsent?client_id=${process.env.MICROSOFT_APP_ID}&state=12345&redirect_uri=${process.env.REDIRECT_URI}`);
+        .button('Consent', `https://login.microsoftonline.com/${process.env.TENANT}/adminconsent?client_id=${process.env.MICROSOFT_APP_ID}&state=12345&redirect_uri=${process.env.REDIRECT_URI}`);
 }
 
 bot.dialog('createUser', [
@@ -86,7 +86,7 @@ bot.dialog('createUser', [
                                     "password": session.privateConversationData['password'],
                                     "forceChangePasswordNextSignIn": true
                                 },
-                                `${session.privateConversationData['userPrincipalName']}@rafaelnunes.onmicrosoft.com`,
+                                `${session.privateConversationData['userPrincipalName']}@${process.env.TENANT_DOMAIN}`,
                                 jsonBody.access_token).then((response) => {
                                     next();
                                 });
